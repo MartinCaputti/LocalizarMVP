@@ -67,16 +67,16 @@
             <th>Total CO₂ (ruta)</th>
             <th>Total Combustible (ruta)</th>
         </tr>
-        <?php foreach ($model->getVehicleProfiles() as $key => $vehicle): ?>
+        <?php foreach ($model->getVehicleProfiles() as $vehiculo): ?>
         <tr>
-            <td><?= $vehicle->nombre ?></td>
-            <td><?= $vehicle->co2_por_km ?> kg</td>
-            <td><?= $vehicle->combustible_por_km ?> L</td>
+            <td><?= $vehiculo->getNombre() ?></td>
+            <td><?= $vehiculo->getCo2PorKm() ?> kg</td>
+            <td><?= $vehiculo->getCombustiblePorKm() ?> L</td>
             <td>
-                <?= $vehicle->calcularEmisiones($model->totalDistanceOptimized / 1000) ?> kg
+                <?= $vehiculo->calcularEmisiones($model->totalDistanceOptimized / 1000) ?> kg
             </td>
             <td>
-                <?= $vehicle->calcularCombustible($model->totalDistanceOptimized / 1000) ?> L
+                <?= $vehiculo->calcularCombustible($model->totalDistanceOptimized / 1000) ?> L
             </td>
         </tr>
         <?php endforeach; ?>

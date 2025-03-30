@@ -10,7 +10,7 @@ MVP para optimización logística usando PHP y APIs gratuitas (OpenRouteService)
 │ └── RouteController.php # Lógica de optimización  
 ├── /models  
 │ └── LocationModel.php # Manejo datos de ubicaciones  
-│ └── Vehiculo.php # Modelo de vehículos 
+│ └── Vehiculo.php # Modelo de vehículos
 ├── /views  
 │ ├── map.php # Mapa interactivo  
 │ └── form.php # Formulario de entrada  
@@ -18,7 +18,7 @@ MVP para optimización logística usando PHP y APIs gratuitas (OpenRouteService)
 │ └── api_keys.php # Claves API  
 ├── /assets
 │ └── /css
-│    └── style.css # Estilos CSS
+│ └── style.css # Estilos CSS
 └── index.php # Punto de entrada
 
 ## Características
@@ -34,12 +34,11 @@ MVP para optimización logística usando PHP y APIs gratuitas (OpenRouteService)
 
 "Ingresé 5 ubicaciones aleatorias de pallets en CABA y el sistema devolvió un recorrido un 15% más corto, con ahorro estimado de 2.3 kg de CO₂."
 
-
-
 ## Nuevas Características
 
 - **Modelo de Vehículos**:  
   Clase dedicada para manejar diferentes tipos de transporte con:
+
   - Cálculo automático de emisiones
   - Consumo de combustible
   - Velocidad promedio
@@ -51,6 +50,15 @@ MVP para optimización logística usando PHP y APIs gratuitas (OpenRouteService)
 - **Fácil extensión**:  
   Añadir nuevos vehículos requiere solo agregar una instancia en LocationModel
 
+## Principios aplicados
+
+- **Encapsulamiento estricto**:  
+  Todos los atributos de los modelos son privados y se acceden mediante métodos públicos
+- **Single Responsibility**:  
+  Cada clase tiene una responsabilidad clara y única
+- **Tell, Don't Ask**:  
+  Los objetos realizan sus propias operaciones en lugar de exponer datos internos
+
 ## Beneficios Clave
 
 1. **Código más mantenible**:  
@@ -61,7 +69,7 @@ MVP para optimización logística usando PHP y APIs gratuitas (OpenRouteService)
 
 3. **Escalabilidad**:  
    Nuevos atributos de vehículos (ej: capacidad de carga) se pueden añadir sin afectar otras clases
-   
+
 ## Próximas Mejoras
 
 - [ ] Mejorar interfaz de usuario
