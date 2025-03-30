@@ -1,4 +1,6 @@
-/* assets/css/style.css */
+/* -----------------------------------
+   Estilo Global
+------------------------------------ */
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
@@ -23,6 +25,9 @@ h1 {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* -----------------------------------
+     Botones y Controles
+  ------------------------------------ */
 button,
 input[type="submit"] {
   background-color: #3498db;
@@ -48,60 +53,14 @@ input[type="submit"]:hover {
   background-color: #c0392b;
 }
 
+/* -----------------------------------
+     Contenedores de Estadísticas
+  ------------------------------------ */
 .stats-container {
   margin: 20px 0;
   padding: 15px;
   background: #f8f9fa;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.comparison-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-}
-
-.comparison-table th,
-.comparison-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-.comparison-table th {
-  background-color: #3498db;
-  color: white;
-}
-
-.comparison-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.vehicle-selector {
-  margin: 15px 0;
-  padding: 10px;
-  background: #ecf0f1;
-  border-radius: 4px;
-}
-
-.vehicle-selector label {
-  margin-right: 10px;
-  font-weight: bold;
-}
-
-.vehicle-selector select {
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #bdc3c7;
-}
-
-/* Estilos para las estadísticas */
-.stats-container {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 15px;
-  margin: 20px 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -128,4 +87,182 @@ input[type="submit"]:hover {
 .highlight .stat-value {
   color: #27ae60;
   font-weight: bold;
+}
+
+/* -----------------------------------
+     Tabla de Comparación de Emisiones
+  ------------------------------------ */
+.comparison-table-container {
+  margin: 20px 0;
+  padding: 15px;
+  background: #fdfdfd;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.comparison-table th {
+  background-color: #3498db;
+  color: white;
+  padding: 12px 8px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.comparison-table td {
+  padding: 10px 8px;
+  border: 1px solid #ddd;
+}
+
+.comparison-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.comparison-table tr:hover {
+  background-color: #e8f6ff;
+}
+
+.comparison-table td,
+.comparison-table th {
+  border-radius: 5px;
+}
+
+.comparison-table td:first-child {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* -----------------------------------
+     Estilos Adicionales para Destacar
+  ------------------------------------ */
+.comparison-table tr td:last-child,
+.comparison-table tr td:nth-last-child(2) {
+  font-weight: bold;
+  color: #27ae60;
+}
+
+.comparison-table th:first-child,
+.comparison-table td:first-child {
+  border-left: 3px solid #3498db;
+}
+
+/* -----------------------------------
+     Selector de Vehículos
+  ------------------------------------ */
+.vehicle-selector {
+  margin: 15px 0;
+  padding: 10px;
+  background: #ecf0f1;
+  border-radius: 4px;
+}
+
+.vehicle-selector label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.vehicle-selector select {
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #bdc3c7;
+}
+
+/* -----------------------------------
+     Estimaciones de Tiempo
+  ------------------------------------ */
+.time-estimate {
+  background: #e3f2fd;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.vehicle-time {
+  font-size: 1.2em;
+  padding: 10px;
+  background: #bbdefb;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.other-vehicles {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.other-vehicles ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.other-vehicles li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.other-vehicles li:last-child {
+  border-bottom: none;
+}
+
+small {
+  font-size: 0.8em;
+  color: #666;
+}
+
+/* -----------------------------------
+     Seccion Clima
+  ------------------------------------ */
+.weather-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f0f7ff;
+  border-radius: 8px;
+}
+
+.weather-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.weather-card {
+  flex: 1;
+  min-width: 200px;
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.weather-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.temperature {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.weather-details p {
+  margin: 5px 0;
+  font-size: 0.9em;
+}
+
+.weather-error {
+  color: #d32f2f;
+  padding: 10px;
+  background: #ffebee;
+  border-radius: 4px;
 }

@@ -5,17 +5,20 @@
   
     
     require_once 'Vehiculo.php'; // Importar el modelo Vehiculo
+    require_once 'WeatherModel.php';
 
     class LocationModel {
+
+        private $weatherModel;
         public $totalDistanceOriginal;
         public $totalDistanceOptimized;
         public $totalCO2;
         public $totalFuel;
-
-        // Perfiles de vehículos
         private $vehicleProfiles;
+       
 
-        public function __construct() {
+        public function __construct(WeatherModel $weatherModel) {
+            $this->weatherModel = $weatherModel;
             $this->vehicleProfiles = [
                 'car' => new Vehiculo("car", "Automóvil", 0.15, 0.08, 60),
                 'truck' => new Vehiculo("truck", "Camión", 0.25, 0.3, 40),
@@ -217,6 +220,26 @@
             
             $diferencia = $this->totalDistanceOriginal - $this->totalDistanceOptimized;
             return round(($diferencia / $this->totalDistanceOriginal) * 100, 2);
+        }
+
+        // Método para calcular el tiempo de viaje
+        public function getTiempoViaje(string $vehicleType): array {
+            $vehiculo = $this->vehicleProfiles[$vehicleType];
+            $distanciaKm = $this->totalDistanceOptimized / 1000;
+            
+            return $vehiculo->calcularTiempoViaje($distanciaKm);
+        }
+
+        // Método para obtener el clima en una ubicación
+        public function getWeatherForRoute(array $locations): array {
+            $weatherData = [];
+            foreach ($locations as $location) {
+                $data = $this->weatherModel->getWeatherData($location['lat'], $location['lng']);
+                if ($data) {
+                    $weatherData[] = $this->weatherModel->formatWeatherData($data);
+                }
+            }
+            return $weatherData;
         }
     }
 ?>

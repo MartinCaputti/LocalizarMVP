@@ -1,12 +1,15 @@
 <?php
-//index.php
-// Archivo principal que inicia la aplicación y carga el controlador
-// Carga de configuraciones y claves API
-
-// Carga del controlador principal
+// index.php
+require_once 'config/api_keys.php';
+require_once 'models/WeatherModel.php';
+require_once 'models/LocationModel.php';
 require_once 'controllers/RouteController.php';
 
-// Instancia del controlador y manejo de la solicitud
-$controller = new RouteController();
+// Configuración de dependencias
+$weatherModel = new WeatherModel(OWM_API_KEY);
+$locationModel = new LocationModel($weatherModel);
+
+// Instancia del controlador con las dependencias inyectadas
+$controller = new RouteController($locationModel);
 $controller->handleRequest();
 ?>

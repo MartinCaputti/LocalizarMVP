@@ -75,6 +75,68 @@
             </span>
         </div>
     </div>
+
+    <div class="time-estimate">
+        <h3>Tiempo Estimado de Viaje</h3>
+        
+        <?php 
+        $tiempoViaje = $model->getTiempoViaje($_POST['vehicle'] ?? 'car');
+        $vehiculo = $model->getVehicleProfiles()[$_POST['vehicle'] ?? 'car'];
+        ?>
+        
+        <div class="vehicle-time">
+            <strong><?= $vehiculo->getNombre() ?>:</strong>
+            <?= $tiempoViaje['formateado'] ?>
+            <small>(Velocidad promedio: <?= $vehiculo->getVelocidadPromedio() ?> km/h)</small>
+        </div>
+        
+        <!-- Comparativa con otros transportes -->
+        <div class="other-vehicles">
+            <h4>Comparativa con otros transportes:</h4>
+            <ul>
+                <?php foreach ($model->getVehicleProfiles() as $tipo => $v): ?>
+                    <?php if ($tipo != ($_POST['vehicle'] ?? 'car')): ?>
+                        <?php $tiempo = $v->calcularTiempoViaje($model->totalDistanceOptimized / 1000); ?>
+                        <li>
+                            <?= $v->getNombre() ?>: <?= $tiempo['formateado'] ?>
+                            <small>(<?= $v->getVelocidadPromedio() ?> km/h)</small>
+                        </li>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Sección de condiciones meteorológicas -->
+    <div class="weather-section">
+        <h3>Condiciones Meteorológicas</h3>
+        
+        <?php 
+        $weatherData = $model->getWeatherForRoute($optimizedRoute);
+        if (!empty($weatherData)): ?>
+            <div class="weather-cards">
+                <?php foreach ($weatherData as $index => $weather): ?>
+                    <div class="weather-card">
+                        <h4>Punto <?= $index + 1 ?>: <?= $weather['city'] ?></h4>
+                        <div class="weather-main">
+                            <img src="https://openweathermap.org/img/wn/<?= $weather['icon'] ?>.png" 
+                                alt="<?= $weather['conditions'] ?>">
+                            <span class="temperature"><?= $weather['temperature'] ?>°C</span>
+                        </div>
+                        <div class="weather-details">
+                            <p>Condiciones: <?= ucfirst($weather['conditions']) ?></p>
+                            <p>Humedad: <?= $weather['humidity'] ?>%</p>
+                            <p>Viento: <?= $weather['wind_speed'] ?> m/s</p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <p class="weather-error">No se pudieron cargar los datos meteorológicos.</p>
+        <?php endif; ?>
+    </div>
+
+    
    
     <div style="margin: 20px 0; padding: 15px; background: #f5f5f5;">
     <h3>Comparación de Emisiones por Transporte</h3>
@@ -101,6 +163,8 @@
         <?php endforeach; ?>
     </table>
     </div>
+   
+   
 
 </body>
 </html>
