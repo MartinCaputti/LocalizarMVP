@@ -1,11 +1,47 @@
 <?php
-
+    // models/LocationModel.php
+    // Clase para manejar la optimización de rutas
+    // y la interacción con la API de OpenRouteService
     class LocationModel {
         // Método para calcular la ruta optimizada
         public function getOptimizedRoute($locations) {
+            // Obtener la matriz de distancias usando [lng, lat]
             $distances = $this->getDistancesMatrix($locations);
-            $optimized = $this->greedyTSP($locations, $distances);
-            return $optimized;
+            
+            // Obtener el orden optimizado de índices (no los objetos)
+            $optimizedOrder = $this->greedyTSP($distances);
+            
+            // Mapear los índices a las ubicaciones reales
+            $optimizedRoute = [];
+            foreach ($optimizedOrder as $index) {
+                $optimizedRoute[] = $locations[$index];
+            }
+            
+            // Calcular distancias
+            $this->totalDistanceOriginal = $this->calculateTotalDistanceOriginal($locations, $distances);
+            $this->totalDistanceOptimized = $this->calculateTotalDistanceOptimized($optimizedOrder, $distances);
+            
+            return $optimizedRoute;
+        }
+        
+        // Calcular distancia del orden original
+        private function calculateTotalDistanceOriginal($locations, $distances) {
+            $total = 0;
+            for ($i = 0; $i < count($locations) - 1; $i++) {
+                $total += $distances[$i][$i + 1] ?? 0;
+            }
+            return $total;
+        }
+
+        // Calcular distancia del orden optimizado
+        private function calculateTotalDistanceOptimized($optimizedOrder, $distances) {
+            $total = 0;
+            for ($i = 0; $i < count($optimizedOrder) - 1; $i++) {
+                $from = $optimizedOrder[$i];
+                $to = $optimizedOrder[$i + 1];
+                $total += $distances[$from][$to] ?? 0;
+            }
+            return $total;
         }
 
         // Método para obtener la matriz de distancias desde OpenRouteService
@@ -15,7 +51,7 @@
             
             // Reestructura las ubicaciones en el formato necesario
             $coords = array_map(function($loc) {
-                return [$loc['lng'], $loc['lat']];
+                return [(float)$loc['lng'], (float)$loc['lat']]; // Convertir explícitamente a float
             }, $locations);
 
             // Cuerpo de la solicitud en formato JSON
@@ -48,39 +84,44 @@
         }
 
         // Algoritmo TSP con matriz de distancias
-        private function greedyTSP($locations, $distances) {
-            $n = count($locations);
+        private function greedyTSP($distances) {
+            $n = count($distances);
             if ($n == 0) return [];
-
+            
             $visited = array_fill(0, $n, false);
-            $route = [];
             $current = 0;
-            $route[] = $locations[$current];
+            $route = [$current];
             $visited[$current] = true;
-
+            
             for ($i = 1; $i < $n; $i++) {
                 $nearest = null;
-                $minDist = PHP_FLOAT_MAX;
-
+                $minDist = PHP_INT_MAX;
+                
                 for ($j = 0; $j < $n; $j++) {
-                    if (!$visited[$j] && isset($distances[$current][$j])) {
-                        $dist = $distances[$current][$j];
-                        if ($dist < $minDist) {
-                            $minDist = $dist;
-                            $nearest = $j;
-                        }
+                    if (!$visited[$j] && $distances[$current][$j] < $minDist) {
+                        $minDist = $distances[$current][$j];
+                        $nearest = $j;
                     }
                 }
-
-                if ($nearest !== null) {
-                    $visited[$nearest] = true;
-                    $route[] = $locations[$nearest];
-                    $current = $nearest;
-                }
+                
+                if ($nearest === null) break;
+                $route[] = $nearest;
+                $visited[$nearest] = true;
+                $current = $nearest;
             }
-
+            
             return $route;
         }
+        
+
+        /*private function calculateTotalDistance($route, $distances) {
+            $total = 0;
+            for ($i = 0; $i < count($route) - 1; $i++) {
+                $total += $distances[$i][$i + 1] ?? 0;
+            }
+            return $total;
+        }*/
     }
 
+  
 ?>

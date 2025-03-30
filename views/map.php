@@ -1,3 +1,9 @@
+<?Php
+    // view/map.php
+    // Muestra el mapa con la ruta optimizada
+    // y los puntos seleccionados por el usuario
+ ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,18 +16,46 @@
     <div id="map" style="height: 500px;"></div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <button id="clearMap" style="margin-top: 10px; padding: 8px 15px; background: #ff4444; color: white; border: none; cursor: pointer;">
+        Limpiar y Volver a Empezar
+    </button>
     <script>
-        const map = L.map('map').setView([<?= $optimizedRoute[0]['lat'] ?>, <?= $optimizedRoute[0]['lng'] ?>], 13);
+        // Inicializar mapa una sola vez
+        const map = L.map('map').setView([<?= $optimizedRoute[0]['lat'] ?? -34.60 ?>, <?= $optimizedRoute[0]['lng'] ?? -58.38 ?>], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Dibuja la ruta optimizada
+        // Dibujar ruta optimizada
         const routeCoords = <?= json_encode($optimizedRoute) ?>;
-        L.polyline(routeCoords.map(coord => [coord.lat, coord.lng]), {color: 'blue'}).addTo(map);
+        if (routeCoords.length > 0) {
+            L.polyline(
+                routeCoords.map(coord => [coord.lat, coord.lng]),
+                {color: 'red', dashArray: '5, 5'}
+            ).addTo(map);
+        }
 
-        // Añade marcadores
+        // Añadir marcadores
         routeCoords.forEach((coord, index) => {
-            L.marker([coord.lat, coord.lng]).bindTooltip(`Punto ${index + 1}`, {permanent: true}).addTo(map);
+            L.marker([coord.lat, coord.lng])
+                .bindPopup(`Punto ${index + 1}<br>Lat: ${coord.lat}<br>Lng: ${coord.lng}`)
+                .addTo(map);
+        });
+
+        // Manejar el botón de limpiar
+        document.getElementById('clearMap').addEventListener('click', () => {
+            // Recargar la página para borrar todo
+            window.location.href = 'index.php';
         });
     </script>
+    <div style="margin: 15px 0; padding: 10px; background: #f0f0f0;">
+        <strong>Distancia total:</strong><br>
+        - Original: <?= round($model->totalDistanceOriginal / 1000, 2) ?> km<br>
+        - Optimizada: <?= round($model->totalDistanceOptimized / 1000, 2) ?> km<br>
+        - Ahorro: <?= round(($model->totalDistanceOriginal - $model->totalDistanceOptimized) / 1000, 2) ?> km
+    </div>
+    <div style="margin: 10px 0; color: #2e7d32;">
+        <strong>Huella de carbono reducida:</strong> 
+        ~<?= round(($model->totalDistanceOriginal - $model->totalDistanceOptimized) / 1000 * 0.2, 2) ?> kg CO₂
+    </div>
+
 </body>
 </html>
