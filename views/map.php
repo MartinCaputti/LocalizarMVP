@@ -10,6 +10,7 @@
     <meta charset="UTF-8">
     <title>Ruta Optimizada</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <h1>Resultado: Ruta Optimizada</h1>

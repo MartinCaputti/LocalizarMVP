@@ -9,6 +9,7 @@
     <title>Optimización de Rutas</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <h1>Optimización de Rutas para Pallets</h1>
