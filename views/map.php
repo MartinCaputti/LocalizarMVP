@@ -4,6 +4,11 @@
     // y los puntos seleccionados por el usuario
  ?>
 
+<?php
+// Añadir al inicio de map.php para debuggear
+// var_dump($model->vehicleProfiles); exit(); // Ver si los datos llegan
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -55,6 +60,31 @@
     <div style="margin: 10px 0; color: #2e7d32;">
         <strong>Huella de carbono reducida:</strong> 
         ~<?= round(($model->totalDistanceOriginal - $model->totalDistanceOptimized) / 1000 * 0.2, 2) ?> kg CO₂
+    </div>
+    <div style="margin: 20px 0; padding: 15px; background: #f5f5f5;">
+    <h3>Comparación de Emisiones por Transporte</h3>
+    <table border="1" style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <th>Vehículo</th>
+                <th>CO₂ por km</th>
+                <th>Combustible por km</th>
+                <th>Total CO₂ (ruta)</th>
+                <th>Total Combustible (ruta)</th>
+            </tr>
+            <?php foreach ($model->getVehicleProfiles() as $key => $vehicle): ?>
+            <tr>
+                <td><?= $vehicle['name'] ?></td>
+                <td><?= $vehicle['co2_per_km'] ?> kg</td>
+                <td><?= $vehicle['fuel_per_km'] ?> L</td>
+                <td>
+                    <?= round(($model->totalDistanceOptimized / 1000) * $vehicle['co2_per_km'], 2) ?> kg
+                </td>
+                <td>
+                    <?= round(($model->totalDistanceOptimized / 1000) * $vehicle['fuel_per_km'], 2) ?> L
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
     </div>
 
 </body>

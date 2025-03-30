@@ -23,7 +23,8 @@ class RouteController {
 
             // Instancia del modelo para procesar datos
             $model = new LocationModel();
-            $optimizedRoute = $model->getOptimizedRoute($coordinates);
+            $vehicleType = $_POST['vehicle'] ?? 'car';
+            $optimizedRoute = $model->getOptimizedRoute($coordinates, $vehicleType);
             
             // Cálculo de la distancia total original y optimizada
             $vehicle = $_POST['vehicle'] ?? 'car';
@@ -34,7 +35,8 @@ class RouteController {
             ];
             $apiUrl = "https://api.openrouteservice.org/v2/matrix/" . $profile[$vehicle];
 
-            // Incluye la vista que mostrará los resultados
+            // Incluye la vista que mostrará los resultados y paso explícitamente el modelo
+            extract(['model' => $model, 'optimizedRoute' => $optimizedRoute]);
             include 'views/map.php';
         } else {
             // Carga del formulario inicial

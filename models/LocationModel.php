@@ -3,8 +3,34 @@
     // Clase para manejar la optimización de rutas
     // y la interacción con la API de OpenRouteService
     class LocationModel {
+        
+        //Referencias para los tipos de vehículos 
+        public $vehicleProfiles = [
+            
+            'car' => [
+                'name' => 'Automóvil',
+                'co2_per_km' => 0.15, // kg CO2/km (gasolina)
+                'fuel_per_km' => 0.08, // litros/km
+            ],
+            'truck' => [
+                'name' => 'Camión',
+                'co2_per_km' => 0.25, 
+                'fuel_per_km' => 0.3,
+            ],
+            'bike' => [
+                'name' => 'Bicicleta/Moto Eléctrica',
+                'co2_per_km' => 0.0,
+                'fuel_per_km' => 0.0,
+            ]
+        ];
+
+        public function getVehicleProfiles() {
+            return $this->vehicleProfiles;
+        }
+        
+
         // Método para calcular la ruta optimizada
-        public function getOptimizedRoute($locations) {
+        public function getOptimizedRoute($locations, $vehicleType)  {
             // Obtener la matriz de distancias usando [lng, lat]
             $distances = $this->getDistancesMatrix($locations);
             
@@ -21,6 +47,13 @@
             $this->totalDistanceOriginal = $this->calculateTotalDistanceOriginal($locations, $distances);
             $this->totalDistanceOptimized = $this->calculateTotalDistanceOptimized($optimizedOrder, $distances);
             
+            // Obtener perfil del vehículo seleccionado
+            $vehicle = $this->vehicleProfiles[$vehicleType];
+            // Calcular emisiones y combustible
+            $this->totalCO2 = round(($this->totalDistanceOptimized / 1000) * $vehicle['co2_per_km'], 2);
+            $this->totalFuel = round(($this->totalDistanceOptimized / 1000) * $vehicle['fuel_per_km'], 2);
+
+
             return $optimizedRoute;
         }
         
