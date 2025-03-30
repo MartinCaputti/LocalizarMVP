@@ -60,27 +60,27 @@
     <div style="margin: 20px 0; padding: 15px; background: #f5f5f5;">
     <h3>Comparación de Emisiones por Transporte</h3>
     <table border="1" style="width: 100%; border-collapse: collapse;">
-            <tr>
-                <th>Vehículo</th>
-                <th>CO₂ por km</th>
-                <th>Combustible por km</th>
-                <th>Total CO₂ (ruta)</th>
-                <th>Total Combustible (ruta)</th>
-            </tr>
-            <?php foreach ($model->getVehicleProfiles() as $key => $vehicle): ?>
-            <tr>
-                <td><?= $vehicle['name'] ?></td>
-                <td><?= $vehicle['co2_per_km'] ?> kg</td>
-                <td><?= $vehicle['fuel_per_km'] ?> L</td>
-                <td>
-                    <?= round(($model->totalDistanceOptimized / 1000) * $vehicle['co2_per_km'], 2) ?> kg
-                </td>
-                <td>
-                    <?= round(($model->totalDistanceOptimized / 1000) * $vehicle['fuel_per_km'], 2) ?> L
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
+        <tr>
+            <th>Vehículo</th>
+            <th>CO₂ por km</th>
+            <th>Combustible por km</th>
+            <th>Total CO₂ (ruta)</th>
+            <th>Total Combustible (ruta)</th>
+        </tr>
+        <?php foreach ($model->getVehicleProfiles() as $key => $vehicle): ?>
+        <tr>
+            <td><?= $vehicle->nombre ?></td>
+            <td><?= $vehicle->co2_por_km ?> kg</td>
+            <td><?= $vehicle->combustible_por_km ?> L</td>
+            <td>
+                <?= $vehicle->calcularEmisiones($model->totalDistanceOptimized / 1000) ?> kg
+            </td>
+            <td>
+                <?= $vehicle->calcularCombustible($model->totalDistanceOptimized / 1000) ?> L
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
     </div>
 
 </body>
