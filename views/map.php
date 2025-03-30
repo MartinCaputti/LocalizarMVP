@@ -47,16 +47,35 @@
             window.location.href = 'index.php';
         });
     </script>
-    <div style="margin: 15px 0; padding: 10px; background: #f0f0f0;">
-        <strong>Distancia total:</strong><br>
-        - Original: <?= round($model->totalDistanceOriginal / 1000, 2) ?> km<br>
-        - Optimizada: <?= round($model->totalDistanceOptimized / 1000, 2) ?> km<br>
-        - Ahorro: <?= round(($model->totalDistanceOriginal - $model->totalDistanceOptimized) / 1000, 2) ?> km
+    <div class="stats-container">
+        <h3>Estadísticas de Optimización</h3>
+        
+        <div class="stat-row">
+            <span class="stat-label">Distancia original:</span>
+            <span class="stat-value"><?= round($model->totalDistanceOriginal / 1000, 2) ?> km</span>
+        </div>
+        
+        <div class="stat-row">
+            <span class="stat-label">Distancia optimizada:</span>
+            <span class="stat-value"><?= round($model->totalDistanceOptimized / 1000, 2) ?> km</span>
+        </div>
+        
+        <div class="stat-row highlight">
+            <span class="stat-label">Reducción de distancia:</span>
+            <span class="stat-value">
+                <?= round(($model->totalDistanceOriginal - $model->totalDistanceOptimized) / 1000, 2) ?> km
+                (<?= $model->getPorcentajeMejora() ?>%)
+            </span>
+        </div>
+        
+        <div class="stat-row">
+            <span class="stat-label">Huella de carbono reducida:</span>
+            <span class="stat-value">
+                ~<?= round(($model->totalDistanceOriginal - $model->totalDistanceOptimized) / 1000 * 0.2, 2) ?> kg CO₂
+            </span>
+        </div>
     </div>
-    <div style="margin: 10px 0; color: #2e7d32;">
-        <strong>Huella de carbono reducida:</strong> 
-        ~<?= round(($model->totalDistanceOriginal - $model->totalDistanceOptimized) / 1000 * 0.2, 2) ?> kg CO₂
-    </div>
+   
     <div style="margin: 20px 0; padding: 15px; background: #f5f5f5;">
     <h3>Comparación de Emisiones por Transporte</h3>
     <table border="1" style="width: 100%; border-collapse: collapse;">

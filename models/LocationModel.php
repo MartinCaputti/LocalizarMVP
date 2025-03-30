@@ -208,5 +208,15 @@
 
             return $nearest;
         }
+
+        //Metodo para calcular el porcentaje de mejora 
+        public function getPorcentajeMejora(): float {
+            if ($this->totalDistanceOriginal == 0) {
+                return 0.0; // Evitar división por cero
+            }
+            
+            $diferencia = $this->totalDistanceOriginal - $this->totalDistanceOptimized;
+            return round(($diferencia / $this->totalDistanceOriginal) * 100, 2);
+        }
     }
 ?>
