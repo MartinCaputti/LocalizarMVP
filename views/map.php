@@ -108,12 +108,10 @@
     </div>
 
     <!-- Sección de condiciones meteorológicas -->
-    <div class="weather-section">
-        <h3>Condiciones Meteorológicas</h3>
-        
-        <?php 
-        $weatherData = $model->getWeatherForRoute($optimizedRoute);
-        if (!empty($weatherData)): ?>
+    <?php if ($incluirClima && !empty($weatherData)): ?>
+        <div class="weather-section">
+            <h3>Condiciones Meteorológicas</h3>
+            
             <div class="weather-cards">
                 <?php foreach ($weatherData as $index => $weather): ?>
                     <div class="weather-card">
@@ -131,11 +129,12 @@
                     </div>
                 <?php endforeach; ?>
             </div>
-        <?php else: ?>
-            <p class="weather-error">No se pudieron cargar los datos meteorológicos.</p>
-        <?php endif; ?>
-    </div>
+        </div>
+        <?php elseif ($incluirClima): ?>
+            <div class="weather-error">No se pudieron cargar los datos meteorológicos.</div>
+            <?php endif; ?>
 
+    
     
    
     <div style="margin: 20px 0; padding: 15px; background: #f5f5f5;">

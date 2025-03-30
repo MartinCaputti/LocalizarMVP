@@ -12,19 +12,28 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<h1>Optimización de Rutas para Pallets</h1>
-<p>Seleccione las ubicaciones en el mapa y haga clic en "Calcular Ruta".</p>
+    <h1>Optimización de Rutas para Pallets</h1>
+    <p>Seleccione las ubicaciones en el mapa y haga clic en "Calcular Ruta".</p>
 
     <form method="POST">
         <input type="hidden" id="coordinates" name="coordinates">
         <div id="map" style="height: 400px;"></div>
+        
+        <div class="form-group">
+            <label for="vehicle">Tipo de vehículo:</label>
+            <select name="vehicle" id="vehicle">
+                <option value="car">Auto</option>
+                <option value="truck">Camión</option>
+                <option value="bike">Moto/Bicicleta</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <input type="checkbox" id="incluir_clima" name="incluir_clima" checked>
+            <label for="incluir_clima">Incluir información meteorológica</label>
+        </div>
+        
         <button type="submit">Calcular Ruta</button>
-        <label for="vehicle">Tipo de vehículo:</label>
-        <select name="vehicle" id="vehicle" style="margin: 10px 0;">
-            <option value="car">Auto</option>
-            <option value="truck">Camión</option>
-            <option value="bike">Moto/Bicicleta</option>
-        </select>
     </form>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>

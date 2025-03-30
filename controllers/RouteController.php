@@ -13,6 +13,7 @@ class RouteController {
         $this->locationModel = $locationModel;
     }
 
+   
     public function handleRequest() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $coordinates = $_POST['coordinates'] ? json_decode($_POST['coordinates'], true) : [];
@@ -27,12 +28,17 @@ class RouteController {
 
             $vehicleType = $_POST['vehicle'] ?? 'car';
             $optimizedRoute = $this->locationModel->getOptimizedRoute($coordinates, $vehicleType);
-            $weatherData = $this->locationModel->getWeatherForRoute($optimizedRoute);
+            
+            // Consultar clima solo si está marcado el checkbox
+            $weatherData = isset($_POST['incluir_clima']) ? 
+                $this->locationModel->getWeatherForRoute($optimizedRoute) : 
+                null;
 
             extract([
                 'model' => $this->locationModel,
                 'optimizedRoute' => $optimizedRoute,
-                'weatherData' => $weatherData
+                'weatherData' => $weatherData,
+                'incluirClima' => isset($_POST['incluir_clima'])
             ]);
             
             include 'views/map.php';
