@@ -4,11 +4,6 @@
     // y los puntos seleccionados por el usuario
  ?>
 
-<?php
-// Añadir al inicio de map.php para debuggear
-// var_dump($model->vehicleProfiles); exit(); // Ver si los datos llegan
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
