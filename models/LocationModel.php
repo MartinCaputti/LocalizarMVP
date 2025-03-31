@@ -82,7 +82,7 @@
             curl_close($ch);
     
             $data = json_decode($response, true);
-            
+    
             if (!isset($data['features'][0]['geometry']['coordinates'])) {
                 throw new RuntimeException("Error al obtener ruta detallada");
             }
@@ -96,7 +96,15 @@
             $this->totalDistanceOptimized = $data['features'][0]['properties']['summary']['distance'];
             $this->totalDistanceOriginal = $this->calculateOriginalDistance($locations);
     
-            return $optimizedRoute;
+            // Guardamos ambos conjuntos de coordenadas:
+            return [
+                'full_route' => array_map(function($point) {
+                    return ['lat' => $point[1], 'lng' => $point[0]];
+                }, $data['features'][0]['geometry']['coordinates']),
+                'waypoints' => array_map(function($index) use ($locations) {
+                    return $locations[$index];
+                }, $order)
+            ];
         }
 
          /**

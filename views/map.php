@@ -25,24 +25,36 @@
         const map = L.map('map').setView([<?= $optimizedRoute[0]['lat'] ?? -34.60 ?>, <?= $optimizedRoute[0]['lng'] ?? -58.38 ?>], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Dibujar ruta optimizada
-        const routeCoords = <?= json_encode($optimizedRoute) ?>;
-        if (routeCoords.length > 0) {
-            const polyline = L.polyline(
-                routeCoords.map(coord => [coord.lat, coord.lng]),
-                {color: 'red', weight: 5}
-            ).addTo(map);
-            
-            // Ajustar el zoom a la ruta
-            map.fitBounds(polyline.getBounds());
-        }
+      
+            // Dibujar la ruta completa
+            const fullRoute = <?= json_encode($fullRoute) ?>;
+            if (fullRoute.length > 0) {
+                L.polyline(
+                    fullRoute.map(coord => [coord.lat, coord.lng]),
+                    {color: '#0066ff', weight: 4, opacity: 0.8}
+                ).addTo(map);
+            }
 
-        // Añadir marcadores
-        routeCoords.forEach((coord, index) => {
-            L.marker([coord.lat, coord.lng])
-                .bindPopup(`Punto ${index + 1}<br>Lat: ${coord.lat}<br>Lng: ${coord.lng}`)
+            // Mostrar solo los puntos de destino
+            const waypoints = <?= json_encode($waypoints) ?>;
+            waypoints.forEach((point, index) => {
+                L.marker([point.lat, point.lng], {
+                    icon: L.divIcon({
+                        className: 'waypoint-marker',
+                        html: `<div class="marker-label">${index + 1}</div>`,
+                        iconSize: [30, 30]
+                    })
+                })
+                .bindPopup(`Punto ${index + 1}<br>Lat: ${point.lat.toFixed(4)}<br>Lng: ${point.lng.toFixed(4)}`)
                 .addTo(map);
-        });
+            });
+
+            // Ajustar el zoom para mostrar toda la ruta
+            if (fullRoute.length > 0) {
+                const routeLine = L.polyline(fullRoute.map(coord => [coord.lat, coord.lng]));
+                map.fitBounds(routeLine.getBounds());
+            }
+
 
         // Manejar el botón de limpiar
         document.getElementById('clearMap').addEventListener('click', () => {

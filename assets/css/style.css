@@ -266,3 +266,24 @@ small {
   background: #ffebee;
   border-radius: 4px;
 }
+
+
+
+
+/* -----------------------------------
+     waypoints
+  ------------------------------------ */
+
+  .waypoint-marker {
+    background: #ff5722;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+.marker-label {
+    margin-top: 2px;
+}
