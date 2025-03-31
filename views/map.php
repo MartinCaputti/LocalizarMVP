@@ -28,10 +28,13 @@
         // Dibujar ruta optimizada
         const routeCoords = <?= json_encode($optimizedRoute) ?>;
         if (routeCoords.length > 0) {
-            L.polyline(
+            const polyline = L.polyline(
                 routeCoords.map(coord => [coord.lat, coord.lng]),
-                {color: 'red', dashArray: '5, 5'}
+                {color: 'red', weight: 5}
             ).addTo(map);
+            
+            // Ajustar el zoom a la ruta
+            map.fitBounds(polyline.getBounds());
         }
 
         // Añadir marcadores

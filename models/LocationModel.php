@@ -38,15 +38,101 @@
          */
         public function getOptimizedRoute(array $locations, string $vehicleType): array {
             $this->validateInput($locations, $vehicleType);
+            
+            // 1. Obtener orden optimizado
+            $optimizedOrder = $this->solveTSP($this->getDistancesMatrix($locations));
+            
+            // 2. Obtener ruta detallada para el orden optimizado
+            return $this->getDetailedRoute($locations, $optimizedOrder, $vehicleType);
+        }
 
-            $distances = $this->getDistancesMatrix($locations);
-            $optimizedOrder = $this->solveTSP($distances);
-            $optimizedRoute = $this->mapToLocations($optimizedOrder, $locations);
 
-            $this->calculateMetrics($distances, $locations, $optimizedOrder, $vehicleType);
-
+        private function getDetailedRoute(array $locations, array $order, string $vehicleType): array {
+            $profile = [
+                'car' => 'driving-car',
+                'truck' => 'driving-hgv',
+                'bike' => 'cycling-regular'
+            ];
+            
+            // Construir lista de coordenadas en orden optimizado
+            $coords = [];
+            foreach ($order as $index) {
+                $coords[] = [(float)$locations[$index]['lng'], (float)$locations[$index]['lat']];
+            }
+            
+            $body = json_encode([
+                'coordinates' => $coords,
+                'geometry' => true,
+                'instructions' => false
+            ]);
+    
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => "https://api.openrouteservice.org/v2/directions/" . $profile[$vehicleType] . "/geojson",
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: ' . ORS_API_KEY,
+                    'Content-Type: application/json'
+                ],
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_RETURNTRANSFER => true
+            ]);
+    
+            $response = curl_exec($ch);
+            curl_close($ch);
+    
+            $data = json_decode($response, true);
+            
+            if (!isset($data['features'][0]['geometry']['coordinates'])) {
+                throw new RuntimeException("Error al obtener ruta detallada");
+            }
+    
+            // Convertir coordenadas [lng, lat] a [lat, lng] para Leaflet
+            $optimizedRoute = array_map(function($point) {
+                return ['lat' => $point[1], 'lng' => $point[0]];
+            }, $data['features'][0]['geometry']['coordinates']);
+    
+            // Almacenar métricas
+            $this->totalDistanceOptimized = $data['features'][0]['properties']['summary']['distance'];
+            $this->totalDistanceOriginal = $this->calculateOriginalDistance($locations);
+    
             return $optimizedRoute;
         }
+
+         /**
+     * Calcula distancia original (orden de entrada)
+        */
+        private function calculateOriginalDistance(array $locations): float {
+            $total = 0;
+            for ($i = 0; $i < count($locations) - 1; $i++) {
+                $total += $this->calculateDistanceBetweenPoints(
+                    $locations[$i],
+                    $locations[$i + 1]
+                );
+            }
+            return $total;
+        }
+
+        
+    /**
+     * Calcula distancia entre dos puntos (fórmula Haversine)
+     */
+    private function calculateDistanceBetweenPoints(array $point1, array $point2): float {
+        $lat1 = deg2rad($point1['lat']);
+        $lon1 = deg2rad($point1['lng']);
+        $lat2 = deg2rad($point2['lat']);
+        $lon2 = deg2rad($point2['lng']);
+
+        $dlat = $lat2 - $lat1;
+        $dlon = $lon2 - $lon1;
+
+        $a = sin($dlat / 2) ** 2 + cos($lat1) * cos($lat2) * sin($dlon / 2) ** 2;
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return 6371000 * $c; // Distancia en metros
+    }
+
+
 
         /**
          * Validación de datos de entrada
@@ -74,19 +160,19 @@
          * Calcula todas las métricas de la ruta
          */
         private function calculateMetrics(
-            array $distances, 
-            array $locations, 
+            array $graph, 
+            array $locations,
             array $optimizedOrder,
             string $vehicleType
         ): void {
             $this->totalDistanceOriginal = $this->calculateRouteDistance(
                 $this->getSequentialIndexes(count($locations)), 
-                $distances
+                $graph
             );
-
+        
             $this->totalDistanceOptimized = $this->calculateRouteDistance(
                 $optimizedOrder, 
-                $distances
+                $graph
             );
 
             $vehiculo = $this->vehicleProfiles[$vehicleType];
@@ -241,5 +327,145 @@
             }
             return $weatherData;
         }
+
+        // Metodo dijkstra para encontrar el camino más corto
+            private function dijkstraShortestPath(array $graph, int $start, int $end): array {
+            $distances = array_fill(0, count($graph), PHP_INT_MAX);
+            $distances[$start] = 0;
+            $previous = array_fill(0, count($graph), null);
+            $queue = array_keys($graph);
+
+            while (!empty($queue)) {
+                // Encontrar el nodo con la distancia mínima
+                $min = PHP_INT_MAX;
+                $current = null;
+                foreach ($queue as $node) {
+                    if ($distances[$node] < $min) {
+                        $min = $distances[$node];
+                        $current = $node;
+                    }
+                }
+
+                if ($current === null || $current === $end) {
+                    break;
+                }
+
+                $queue = array_diff($queue, [$current]);
+
+                foreach ($graph[$current] as $neighbor => $distance) {
+                    if ($distance > 0) {
+                        $alt = $distances[$current] + $distance;
+                        if ($alt < $distances[$neighbor]) {
+                            $distances[$neighbor] = $alt;
+                            $previous[$neighbor] = $current;
+                        }
+                    }
+                }
+            }
+
+            // Reconstruir el camino
+            $path = [];
+            $current = $end;
+            while ($current !== null) {
+                array_unshift($path, $current);
+                $current = $previous[$current];
+            }
+
+            return $path;
+        }
+
+
+        // Método para obtener el grafo de distancias de calles
+
+        private function getStreetDistanceGraph(array $locations, string $vehicleType): array {
+            $profile = [
+                'car' => 'driving-car',
+                'truck' => 'driving-hgv',
+                'bike' => 'cycling-regular'
+            ];
+            
+            $coords = array_map(function($loc) {
+                return [(float)$loc['lng'], (float)$loc['lat']];
+            }, $locations);
+        
+            $body = json_encode([
+                'locations' => $coords,
+                'metrics' => ['distance'],
+                'sources' => ['all'],
+                'destinations' => ['all']
+            ]);
+        
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => "https://api.openrouteservice.org/v2/matrix/" . $profile[$vehicleType],
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: ' . ORS_API_KEY,
+                    'Content-Type: application/json'
+                ],
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_RETURNTRANSFER => true
+            ]);
+        
+            $response = curl_exec($ch);
+            curl_close($ch);
+        
+            $data = json_decode($response, true);
+
+            // Veriverificar que la API retorna datos válidos
+            if (!isset($data['distances'])) {
+                throw new RuntimeException("Error en respuesta de la API: " . json_encode($data));
+            }
+
+
+            return $data['distances'] ?? [];
+        }
+
+        /**
+         * Calcula la ruta óptima usando el algoritmo de Dijkstra
+         */
+
+         private function calculateOptimalRoute(array $graph): array {
+            $n = count($graph);
+            if ($n <= 1) return [0];
+            
+            $route = [0];
+            $visited = [0 => true];
+            
+            for ($i = 1; $i < $n; $i++) {
+                $last = end($route);
+                $next = $this->findNearestNode($last, $graph, $visited);
+                
+                if ($next === null) break;
+                
+                $route[] = $next;
+                $visited[$next] = true;
+            }
+            
+            return $route;
+        }
+
+
+        /**
+         * Encuentra el nodo más cercano no visitado
+         */
+
+         private function findNearestNode(int $current, array $graph, array $visited): ?int {
+            $nearest = null;
+            $minDist = PHP_INT_MAX;
+    
+            foreach ($graph[$current] as $node => $distance) {
+                if (!isset($visited[$node])) {
+                    if ($distance < $minDist) {
+                        $minDist = $distance;
+                        $nearest = $node;
+                    }
+                }
+            }
+    
+            return $nearest;
+        }
+
+
     }
 ?>
