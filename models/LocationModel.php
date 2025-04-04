@@ -338,49 +338,49 @@
 
         // Metodo dijkstra para encontrar el camino más corto
             private function dijkstraShortestPath(array $graph, int $start, int $end): array {
-            $distances = array_fill(0, count($graph), PHP_INT_MAX);
-            $distances[$start] = 0;
-            $previous = array_fill(0, count($graph), null);
-            $queue = array_keys($graph);
+                $distances = array_fill(0, count($graph), PHP_INT_MAX);
+                $distances[$start] = 0;
+                $previous = array_fill(0, count($graph), null);
+                $queue = array_keys($graph);
 
-            while (!empty($queue)) {
-                // Encontrar el nodo con la distancia mínima
-                $min = PHP_INT_MAX;
-                $current = null;
-                foreach ($queue as $node) {
-                    if ($distances[$node] < $min) {
-                        $min = $distances[$node];
-                        $current = $node;
+                while (!empty($queue)) {
+                    // Encontrar el nodo con la distancia mínima
+                    $min = PHP_INT_MAX;
+                    $current = null;
+                    foreach ($queue as $node) {
+                        if ($distances[$node] < $min) {
+                            $min = $distances[$node];
+                            $current = $node;
+                        }
                     }
-                }
 
-                if ($current === null || $current === $end) {
-                    break;
-                }
+                    if ($current === null || $current === $end) {
+                        break;
+                    }
 
-                $queue = array_diff($queue, [$current]);
+                    $queue = array_diff($queue, [$current]);
 
-                foreach ($graph[$current] as $neighbor => $distance) {
-                    if ($distance > 0) {
-                        $alt = $distances[$current] + $distance;
-                        if ($alt < $distances[$neighbor]) {
-                            $distances[$neighbor] = $alt;
-                            $previous[$neighbor] = $current;
+                    foreach ($graph[$current] as $neighbor => $distance) {
+                        if ($distance > 0) {
+                            $alt = $distances[$current] + $distance;
+                            if ($alt < $distances[$neighbor]) {
+                                $distances[$neighbor] = $alt;
+                                $previous[$neighbor] = $current;
+                            }
                         }
                     }
                 }
-            }
 
-            // Reconstruir el camino
-            $path = [];
-            $current = $end;
-            while ($current !== null) {
-                array_unshift($path, $current);
-                $current = $previous[$current];
-            }
+                // Reconstruir el camino
+                $path = [];
+                $current = $end;
+                while ($current !== null) {
+                    array_unshift($path, $current);
+                    $current = $previous[$current];
+                }
 
-            return $path;
-        }
+                return $path;
+            }
 
 
         // Método para obtener el grafo de distancias de calles

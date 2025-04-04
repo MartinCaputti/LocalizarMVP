@@ -1,14 +1,20 @@
-<?Php
+<?php
     // view/form.php
     // Formulario para la optimización de rutas
- ?>
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Optimización de Rutas</title>
+    
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    
+    <!-- Leaflet Geocoder CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <!-- Estilos propios -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -36,25 +42,36 @@
         <button type="submit">Calcular Ruta</button>
     </form>
 
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Leaflet Geocoder JS -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <!-- Script de inicialización -->
     <script>
-        const map = L.map('map').setView([-34.60, -58.38], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        window.addEventListener('load', () => {
+            const map = L.map('map').setView([-34.60, -58.38], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        const geocoder = L.Control.Geocoder.nominatim();
-        const control = L.Control.geocoder({
-            geocoder: geocoder,
-            position: 'topright'
-        }).addTo(map);
+            // Verificar si el geocoder está disponible
+            if (L.Control.Geocoder && L.Control.Geocoder.nominatim) {
+                const geocoder = L.Control.Geocoder.nominatim();
+                const control = L.Control.geocoder({
+                    geocoder: geocoder,
+                    position: 'topright'
+                }).addTo(map);
+            } else {
+                console.warn("El geocoder no está disponible. Puede que no se haya cargado correctamente.");
+            }
 
-        const markers = [];
-        map.on('click', (e) => {
-            const marker = L.marker(e.latlng).addTo(map);
-            markers.push(e.latlng);
-            document.getElementById('coordinates').value = JSON.stringify(markers);
+            const markers = [];
+            map.on('click', (e) => {
+                const marker = L.marker(e.latlng).addTo(map);
+                markers.push(e.latlng);
+                document.getElementById('coordinates').value = JSON.stringify(markers);
+            });
         });
     </script>
-    
 </body>
 </html>
